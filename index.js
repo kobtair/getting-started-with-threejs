@@ -15,6 +15,7 @@ fetch("./e2/visualization_info.json")
   })
   .catch((error) => console.error("Error loading JSON:", error));
 
+
 const w = window.innerWidth;
 const h = window.innerHeight;
 
@@ -27,7 +28,7 @@ const near = 0.1;
 const far = 10000;
 
 const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-camera.position.set(4000, 0, -2000);
+// camera.position.set(4000, 0, -2000);
 camera.lookAt(0, 0, 0);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xa0a0a0);
@@ -52,6 +53,9 @@ loader.load("/e2/output_mesh.stl", function (geometry) {
   });
 
   const {x: numberX, y: numberY, z: numberZ} = visualData.n_items;
+  // const numberX = 1000;
+  // const numberY = 1000;
+  // const numberZ = 1000;
   const { x: deltaX, y: deltaY, z: deltaZ } = visualData.deltas;
   const lines = visualData.lines;
   let positions = {
@@ -61,25 +65,35 @@ loader.load("/e2/output_mesh.stl", function (geometry) {
   };
 
   for (let i = 0; i < numberX; i++) {
-    const mesh = new THREE.Mesh(geometry, materialX);
-    mesh.position.set(positions.x, 0, 0);
-    scene.add(mesh);
-    positions.x = positions.x + deltaX;
+    // let positions = {
+    //   x: 0,
+    //   y: 0,
+    //   z: 0,
+    // };
+    positions.y = 0
+
+    // const mesh = new THREE.Mesh(geometry, materialX);
+    // mesh.position.set(positions.x, 0, 0);
+    // scene.add(mesh);
+    // positions.x = positions.x + deltaX;
+    for (let j = 0; j < numberY; j++) {
+      positions.z = 0
+      // const mesh = new THREE.Mesh(geometry, materialY);
+      // mesh.position.set(0, positions.y, 0);
+      // scene.add(mesh);
+      // positions.y = positions.y + deltaY;
+      for (let k = 0; k < numberZ; k++) {
+        const mesh = new THREE.Mesh(geometry, materialZ);
+        mesh.position.set(positions.x, positions.y, positions.z);
+        scene.add(mesh);
+        positions.z = positions.z + deltaZ;
+      }
+      positions.y = positions.y + deltaY
+    }
+    positions.x = positions.x + deltaX
   }
 
-  for (let j = 0; j < numberY; j++) {
-    const mesh = new THREE.Mesh(geometry, materialY);
-    mesh.position.set(0, positions.y, 0);
-    scene.add(mesh);
-    positions.y = positions.y + deltaY;
-  }
 
-  for (let k = 0; k < numberZ; k++) {
-    const mesh = new THREE.Mesh(geometry, materialZ);
-    mesh.position.set(0, 0, positions.z);
-    scene.add(mesh);
-    positions.z = positions.z + deltaZ;
-  }
 
   lines.map((pointsArray) => {
     const point1 = new THREE.Vector3(
@@ -98,6 +112,7 @@ loader.load("/e2/output_mesh.stl", function (geometry) {
     const line = new THREE.Line(geometry, material);
     scene.add(line);
   });
+  camera.position.set(numberX * deltaX + 5000, 0, numberZ * deltaZ );
 });
 
 function animate() {
